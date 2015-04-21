@@ -1,0 +1,4 @@
+RainbowArmour
+=============
+
+A bukkit plugin
