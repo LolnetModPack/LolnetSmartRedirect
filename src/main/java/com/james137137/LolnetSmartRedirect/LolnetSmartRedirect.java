@@ -3,9 +3,9 @@ package com.james137137.LolnetSmartRedirect;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.md_5.bungee.api.plugin.Plugin;
+import nz.co.lolnet.lolnetfourmpermissionbcbridge.LolnetFourmPermissionBCBridge;
 
 /**
  *
@@ -23,26 +24,18 @@ public class LolnetSmartRedirect extends Plugin {
     public static HashMap<String,PlayerLoginData> playerMap;
     static Logger log;
     private static final int PORT = 10009;
-    BroadcastInfomationListener Listener;
+    InfomationListener Listener;
     static LolnetSmartRedirect plugin;
     public static boolean run = false;
     static ServerSocket serverSocket = null;
-
-    public static void main(String[] args) {
-        List<String> modlist1 = new ArrayList<>();
-        modlist1.add("a");
-        modlist1.add("b");
-        modlist1.add("c");
-        modlist1.add("d");
-        modlist1.add("e");
-        String data = modlist1.toString();
-        System.out.println(data);
-        data = data.replace("[", "").replace("]", "");
-        List<String> modList = Arrays.asList(data.split(", ", -1));
-        System.out.println(modList.toString());
-        for (String modLista : modList) {
-            System.out.println(modLista);
+    
+    public static boolean isfourmRegistered(String userName) {
+        boolean result = false;
+        try {
+            result = LolnetFourmPermissionBCBridge.getRankList(userName).contains("REGISTERED");
+        } catch (Exception ex) {
         }
+        return result;
     }
 
     @Override
@@ -51,7 +44,7 @@ public class LolnetSmartRedirect extends Plugin {
         getProxy().getPluginManager().registerListener(this, new MyListener(this));
         plugin = this;
         log = this.getLogger();
-        Listener = new BroadcastInfomationListener();
+        Listener = new InfomationListener();
     }
 
     @Override
@@ -59,9 +52,9 @@ public class LolnetSmartRedirect extends Plugin {
         Listener = null;
     }
 
-    private static class BroadcastInfomationListener {
+    private static class InfomationListener {
 
-        public BroadcastInfomationListener() {
+        public InfomationListener() {
 
             try {
                 serverSocket = new ServerSocket(LolnetSmartRedirect.PORT);
@@ -105,6 +98,8 @@ public class LolnetSmartRedirect extends Plugin {
 
             Socket clientSocket;
             BufferedReader in;
+            PrintWriter out;
+                
 
             public ThreadListenClient(final Socket clientSocket) {
 
@@ -114,8 +109,9 @@ public class LolnetSmartRedirect extends Plugin {
                     public void run() {
                         try {
                             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                            out = new PrintWriter(clientSocket.getOutputStream(), true);
                         } catch (IOException ex) {
-                            Logger.getLogger(BroadcastInfomationListener.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(InfomationListener.class.getName()).log(Level.SEVERE, null, ex);
                             return;
                         }
                         try {
@@ -135,14 +131,16 @@ public class LolnetSmartRedirect extends Plugin {
                                         System.out.println(playerLoginData.toString());
                                     }
                                 }
+                                out.println("done");
                             }
                         } catch (Exception ex) {
                         }
                         try {
                             in.close();
+                            out.close();
                             clientSocket.close();
                         } catch (IOException ex) {
-                            Logger.getLogger(BroadcastInfomationListener.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(InfomationListener.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 });

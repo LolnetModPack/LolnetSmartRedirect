@@ -29,5 +29,18 @@
             <version>1.8-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>nz.co.lolnet</groupId>
+            <artifactId>LolnetFourmPermissionBCBridge</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/LolnetFourmPermissionBCBridge.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>
