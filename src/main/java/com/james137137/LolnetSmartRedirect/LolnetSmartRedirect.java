@@ -21,14 +21,14 @@ import nz.co.lolnet.lolnetfourmpermissionbcbridge.LolnetFourmPermissionBCBridge;
  */
 public class LolnetSmartRedirect extends Plugin {
 
-    public static HashMap<String,PlayerLoginData> playerMap;
+    public static HashMap<String, PlayerLoginData> playerMap;
     static Logger log;
     private static final int PORT = 10009;
     InfomationListener Listener;
     static LolnetSmartRedirect plugin;
     public static boolean run = false;
     static ServerSocket serverSocket = null;
-    
+
     public static boolean isfourmRegistered(String userName) {
         boolean result = false;
         try {
@@ -58,10 +58,10 @@ public class LolnetSmartRedirect extends Plugin {
 
             try {
                 serverSocket = new ServerSocket(LolnetSmartRedirect.PORT);
-                System.out.println("listening on port: " + LolnetSmartRedirect.PORT + " for server messages.");
+                log.info("listening on port: " + LolnetSmartRedirect.PORT + " for server messages.");
                 run = true;
             } catch (IOException e) {
-                System.err.println("Could not listen on port: " + LolnetSmartRedirect.PORT);
+                log.warning("Could not listen on port: " + LolnetSmartRedirect.PORT);
                 return;
             }
 
@@ -99,7 +99,6 @@ public class LolnetSmartRedirect extends Plugin {
             Socket clientSocket;
             BufferedReader in;
             PrintWriter out;
-                
 
             public ThreadListenClient(final Socket clientSocket) {
 
@@ -116,22 +115,34 @@ public class LolnetSmartRedirect extends Plugin {
                         }
                         try {
                             String inputLine;
+                            String playerName = null;
                             while ((inputLine = in.readLine()) != null) {
                                 if (inputLine.contains("~~~")) {
                                     String[] split = inputLine.split("~~~");
                                     if (split.length == 4) {
                                         UUID playerUUID = UUID.fromString(split[0]);
-                                        String playerName = split[1];
+                                        playerName = split[1];
                                         String modPackName = split[2];
                                         String data = split[3];
                                         data = data.replace("[", "").replace("]", "");
                                         List<String> modList = Arrays.asList(data.split(", ", -1));
-                                        PlayerLoginData playerLoginData = new PlayerLoginData(playerName,modPackName,modList);
+                                        PlayerLoginData playerLoginData = new PlayerLoginData(playerName, modPackName, modList);
                                         LolnetSmartRedirect.playerMap.put(playerName, playerLoginData);
-                                        System.out.println(playerLoginData.toString());
                                     }
                                 }
-                                out.println("done");
+                                if (playerName == null) {
+                                    out.println("MessageFormatError");
+                                } else {
+                                    if (LolnetSmartRedirect.isfourmRegistered(playerName)) {
+                                        out.println("Registered");
+                                    }
+                                    else
+                                    {
+                                        out.println("NotRegistered");
+                                    }
+                                }
+
+                                
                             }
                         } catch (Exception ex) {
                         }

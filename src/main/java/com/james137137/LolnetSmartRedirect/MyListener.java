@@ -32,7 +32,7 @@ public class MyListener implements Listener {
     @EventHandler
     public void onPlayerLogin(PreLoginEvent event) {
         String playerName = event.getConnection().getName();
-        
+
         if (LolnetSmartRedirect.playerMap.containsKey(playerName)) {
 
             firstTimeLogin.add(playerName);
@@ -41,9 +41,7 @@ public class MyListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(ServerConnectEvent event) {
-        System.out.println(event.getPlayer().getName() + " " + LolnetSmartRedirect.isfourmRegistered(event.getPlayer().getName()));
         ProxiedPlayer player = event.getPlayer();
-        System.out.println(firstTimeLogin.contains(player.getName()));
         if (firstTimeLogin.contains(player.getName()) && LolnetSmartRedirect.playerMap.get(player.getName()) != null) {
             firstTimeLogin.remove(player.getName());
             ServerInfo target = event.getTarget();
@@ -56,6 +54,13 @@ public class MyListener implements Listener {
                 ServerInfo serverInfo = LolnetSmartRedirect.plugin.getProxy().getServers().get(playerData.modPackName);
                 if (serverInfo != null) {
                     event.setTarget(serverInfo);
+                } else {
+                    if (playerData.modPackName.equals("ArnsForgotSomethingHere") && playerData.modList.contains("lotr")) {
+                        serverInfo = LolnetSmartRedirect.plugin.getProxy().getServers().get("TolkienCraft");
+                        if (serverInfo != null) {
+                            event.setTarget(serverInfo);
+                        }
+                    }
                 }
             }
         } else {
@@ -73,15 +78,15 @@ public class MyListener implements Listener {
 
         //check if member
         if (event.getTarget().getName().contains("tolkien") && !LolnetSmartRedirect.isfourmRegistered(player.getName())) {
-            event.getPlayer().sendMessage(ChatColor.GREEN + "Please Register on fourm");
-            event.setTarget(LolnetSmartRedirect.plugin.getProxy().getServers().get("lobby3"));
+            event.getPlayer().disconnect(ChatColor.GREEN + "Please Register on fourm: lolnet.co.nz before entering TolkienCraft");
+            //event.getPlayer().sendMessage(ChatColor.GREEN + "Please Register on fourm");
+            //event.setTarget(LolnetSmartRedirect.plugin.getProxy().getServers().get("lobby3"));
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKickEvent(ServerKickEvent ev) {
-        if (ev.getKickedFrom().getName().contains("tolkien"))
-        {
+        if (ev.getKickedFrom().getName().contains("tolkien")) {
             ev.setCancelled(true);
             ev.setCancelServer(LolnetSmartRedirect.plugin.getProxy().getServers().get("lobby3"));
         }
