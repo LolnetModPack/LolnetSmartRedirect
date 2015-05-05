@@ -82,6 +82,11 @@ public class MyListener implements Listener {
             //event.getPlayer().sendMessage(ChatColor.GREEN + "Please Register on fourm");
             //event.setTarget(LolnetSmartRedirect.plugin.getProxy().getServers().get("lobby3"));
         }
+        if (LolnetSmartRedirect.config.getStringList("MemberOnlyServers").contains(event.getTarget().getName()) && !LolnetSmartRedirect.isfourmRegistered(player.getName()))
+        {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.GREEN + "Please Register on fourm: lolnet.co.nz before entering " + event.getPlayer().getName());
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
